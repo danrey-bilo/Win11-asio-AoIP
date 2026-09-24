@@ -21,11 +21,7 @@ clone выполните `git submodule update --init --recursive`. Для пр�
 Обновление зависимости: выберите проверенный commit внутри submodule и
 закоммитьте новый gitlink в родительском репозитории.
 
-```powershell
-./scripts/build.ps1 -ToolchainBin C:/Tools/llvm-mingw/bin -AsioSdkDir C:/SDK/asio
-```
-
-Либо через CMake напрямую:
+Сборка рабочего драйвера напрямую через CMake:
 
 ```powershell
 cmake -S . -B build/windows -G Ninja -DCMAKE_BUILD_TYPE=Release `
@@ -33,26 +29,22 @@ cmake -S . -B build/windows -G Ninja -DCMAKE_BUILD_TYPE=Release `
   -DCMAKE_RC_COMPILER=C:/Tools/llvm-mingw/bin/x86_64-w64-mingw32-windres.exe `
   -DASIO_SDK_DIR=C:/SDK/asio
 cmake --build build/windows --parallel 2
-ctest --test-dir build/windows --output-on-failure --timeout 30
 ```
 
-Готовые `PiAoipAsio.dll`, `PiAoipControl.exe`, `smoke_host.exe` находятся
+Готовые `PiAoipAsio.dll` и `PiAoipControl.exe` находятся
 в `build/windows/bin`. Нативные зависимости приложения — системные DLL Windows;
 C++ runtime для MinGW включён статически. Сборка не меняет системную регистрацию.
 
 ## MSI
 
-Установите WiX Toolset 7 с расширениями `WixToolset.UI.wixext` и
-`WixToolset.Firewall.wixext` соответствующей версии. Затем:
-
-```powershell
-./packaging/msi/build-msi.ps1 -AsioSdkDir C:/SDK/asio
-```
-
-Скрипт упаковывает уже собранные файлы. Результат: `dist/PiAoIP-2.1.0-Windows11-x64.msi`.
-Он включает инструкцию, лицензию проекта и уведомление ASIO SDK. Цифровая подпись
-сама не создаётся: для подписанного распространения нужен сертификат издателя.
-Условия распространения ASIO-сборки описаны в [ASIO-SDK.md](ASIO-SDK.md).
+Скрипты сборки и исходники установщика находятся в закрытом
+[AoIP-debug-tool](https://github.com/danrey-bilo/AoIP-debug-tool/blob/main/docs/BUILD.md)
+для разработчиков проекта. Для основной CMake-сборки доступ к нему не нужен.
+Упаковка требует WiX Toolset 7 и расширений UI/Firewall. MSI содержит DLL,
+панель настроек, инструкции и лицензии; тестовый ASIO-хост в него не входит.
+Для установки используйте полученный `PiAoIP-2.1.0-Windows11-x64.msi`.
+Цифровая подпись требует сертификата издателя. Условия распространения ASIO-сборки
+описаны в [ASIO-SDK.md](ASIO-SDK.md).
 
 ## Установка
 
@@ -93,3 +85,9 @@ MSI удаляет собственные файлы, регистрацию и 
 INI сохраняется. Повторный запуск MSI позволяет восстановить компоненты.
 Системный WDM/WASAPI endpoint не создаётся: Discord и Telegram напрямую ASIO DLL
 не используют. [API и свой хост](API.md).
+
+## Проверки разработчика
+
+Тесты конфигурации и `smoke_host` перенесены в
+[AoIP-debug-tool](https://github.com/danrey-bilo/AoIP-debug-tool/blob/main/docs/windows/TESTING.md).
+Рабочий драйвер и его CMake-сборка от этого репозитория не зависят.

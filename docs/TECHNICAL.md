@@ -31,4 +31,4 @@ blocking могут увеличивать хвост задержки. Упра
 
 Производительность измеряется p50/p95/p99/max вместе с потерями, late/missing,
 deadline misses, overflow, TX expired и нагрузкой CPU. Одного `lost=0` недостаточно.
-Подробности: [проверки](TESTING.md).
+Подробности: [проверки](https://github.com/danrey-bilo/AoIP-debug-tool/blob/main/docs/windows/TESTING.md).

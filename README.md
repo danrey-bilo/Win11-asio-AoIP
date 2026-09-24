@@ -48,12 +48,14 @@ ASIO SDK. The SDK is not included in this repository. See the
 ```powershell
 git clone --recurse-submodules https://github.com/danrey-bilo/Win11-asio-AoIP.git
 cd Win11-asio-AoIP
-./scripts/build.ps1 -ToolchainBin C:/Tools/llvm-mingw/bin -AsioSdkDir C:/SDK/asio
-./packaging/msi/build-msi.ps1 -AsioSdkDir C:/SDK/asio
+cmake -S . -B build/windows -G Ninja -DCMAKE_BUILD_TYPE=Release `
+  -DCMAKE_CXX_COMPILER=C:/Tools/llvm-mingw/bin/x86_64-w64-mingw32-clang++.exe `
+  -DCMAKE_RC_COMPILER=C:/Tools/llvm-mingw/bin/x86_64-w64-mingw32-windres.exe `
+  -DASIO_SDK_DIR=C:/SDK/asio
+cmake --build build/windows --parallel 2
 ```
 
-The DLL and EXE files are written to `build/windows/bin`; the MSI is written
-to `dist`. Building does not register or install the driver. See the
+The driver DLL and settings EXE are written to `build/windows/bin`. Building does not register or install the driver. See the
 [installation, network and settings guide (Russian)](docs/BUILD.md).
 
 ## Repository layout
@@ -65,16 +67,14 @@ src/control/       discovery and UDP commands
 src/platform/      Windows MMCSS, affinity and timers
 src/ui/            settings panel and resources
 apps/              settings panel launcher
-tools/             minimal ASIO host
 external/AoIP-lib/  shared library pinned as a Git submodule
-packaging/msi/     WiX installer
-tests/             Windows configuration checks
 docs/              API, architecture and guides
 ```
 
 ## Documentation
 
-Detailed guides are currently available in Russian.
+Detailed guides are currently available in Russian. Test reports link to the
+private developer repository and require project access.
 
 | Guide | Contents |
 |---|---|
@@ -82,9 +82,15 @@ Detailed guides are currently available in Russian.
 | [ASIO host integration](docs/API.md) | Using the driver from your own host |
 | [Architecture](docs/ARCHITECTURE.md) | Driver components, threads and audio data flow |
 | [Technical overview](docs/TECHNICAL.md) | Transport characteristics and operating limits |
-| [Testing](docs/TESTING.md) | Test procedure and measurement scope |
-| [Build validation](docs/BUILD-VALIDATION.md) | Checks performed on the separated repository |
+| [Testing](https://github.com/danrey-bilo/AoIP-debug-tool/blob/main/docs/windows/TESTING.md) | Test procedure and measurement scope |
+| [Build validation](https://github.com/danrey-bilo/AoIP-debug-tool/blob/main/docs/windows/INITIAL-BUILD-VALIDATION.md) | Checks performed on the separated repository |
 | [ASIO SDK](docs/ASIO-SDK.md) | External dependency and distribution conditions |
+
+## Development tooling
+
+Tests, executable examples, diagnostics and installer build scripts are maintained
+in the private [AoIP-debug-tool](https://github.com/danrey-bilo/AoIP-debug-tool) repository for authorized project developers.
+They are not part of this library or its build requirements.
 
 ## Related projects
 

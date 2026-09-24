@@ -8,7 +8,7 @@ ASIO-драйвер для **Windows 11 x64**: до 64 входов и 64 вых
 сети, настройка профиля из панели драйвера и установка через MSI.
 Работает внутри 64-битного ASIO-хоста.
 
-**[Начало работы](docs/BUILD.md)** · **[Архитектура](docs/ARCHITECTURE.md)** · **[Техническое описание](docs/TECHNICAL.md)** · **[Проверки](docs/TESTING.md)** · **[Лицензия](docs/LICENSE-RU.md)**
+**[Начало работы](docs/BUILD.md)** · **[Архитектура](docs/ARCHITECTURE.md)** · **[Техническое описание](docs/TECHNICAL.md)** · **[Проверки](https://github.com/danrey-bilo/AoIP-debug-tool/blob/main/docs/windows/TESTING.md)** · **[Лицензия](docs/LICENSE-RU.md)**
 
 ## Возможности
 
@@ -46,11 +46,14 @@ SDK не включён в репозиторий. [Лицензирование
 ```powershell
 git clone --recurse-submodules https://github.com/danrey-bilo/Win11-asio-AoIP.git
 cd Win11-asio-AoIP
-./scripts/build.ps1 -ToolchainBin C:/Tools/llvm-mingw/bin -AsioSdkDir C:/SDK/asio
-./packaging/msi/build-msi.ps1 -AsioSdkDir C:/SDK/asio
+cmake -S . -B build/windows -G Ninja -DCMAKE_BUILD_TYPE=Release `
+  -DCMAKE_CXX_COMPILER=C:/Tools/llvm-mingw/bin/x86_64-w64-mingw32-clang++.exe `
+  -DCMAKE_RC_COMPILER=C:/Tools/llvm-mingw/bin/x86_64-w64-mingw32-windres.exe `
+  -DASIO_SDK_DIR=C:/SDK/asio
+cmake --build build/windows --parallel 2
 ```
 
-Выходные DLL/EXE находятся в `build/windows/bin`, MSI — в `dist`.
+DLL драйвера и EXE панели находятся в `build/windows/bin`.
 Сборка не регистрирует драйвер и не устанавливает его в систему.
 [Установка, сеть и настройки](docs/BUILD.md).
 
@@ -63,14 +66,17 @@ src/control/       обнаружение и команды UDP
 src/platform/      MMCSS, affinity и таймеры Windows
 src/ui/            панель настроек и ресурсы
 apps/              запуск панели
-tools/             минимальный ASIO-хост
 external/AoIP-lib/  общая библиотека, закреплённая git submodule
-packaging/msi/     WiX installer
-tests/             конфигурация Windows
 docs/              API, архитектура и инструкции
 ```
 
 **[Подключение своего ASIO-хоста](docs/API.md)** · **[Техническое описание](docs/TECHNICAL.md)**
+
+## Средства разработки
+
+Тесты, запускаемые примеры, диагностика и скрипты сборки установщиков находятся
+в закрытом [AoIP-debug-tool](https://github.com/danrey-bilo/AoIP-debug-tool) для разработчиков проекта.
+Они не входят в библиотеку и не нужны для её сборки.
 
 ## Компоненты проекта
 
