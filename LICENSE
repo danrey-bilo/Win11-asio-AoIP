@@ -1,0 +1,53 @@
+AoIP Personal Use and Commercial License 1.0
+Copyright (c) 2026 danrey-bilo. All rights reserved except as granted below.
+
+1. Personal Noncommercial License
+The copyright holder grants individuals a worldwide, royalty-free, nonexclusive
+license to use, copy, study, modify, build, and integrate this software into their
+own personal, noncommercial projects. You may share the original or modified
+software, in source or binary form, without charge, solely for personal,
+noncommercial use under these same terms. Preserve this license and the copyright
+notice, identify material modifications, and include this license with copies.
+There is no requirement to publish private modifications.
+
+2. Commercial Use Requires a Separate Paid License
+Commercial use is not granted by this license. It requires a separate written,
+paid commercial license from the copyright holder before such use begins.
+Commercial use includes, without limitation: use in or for a business or an
+organization's operations; use in paid employment, contracting, or consulting;
+selling or licensing a product containing the software; providing a paid service
+using the software; and use in advertising-supported, subscription-funded, or
+otherwise monetized products or services. Making a component free of charge does
+not make its use noncommercial when it supports a commercial activity.
+
+For commercial licensing, contact danrey-bilo:
+https://github.com/danrey-bilo
+Use the repository's issue tracker to request licensing contact details. No price,
+scope, support obligation, or commercial right is implied until separately agreed
+in writing. Possession of this source code or payment to another party is not a
+commercial license.
+
+3. Restrictions and Third-Party Materials
+Do not remove licensing notices, offer these materials under conflicting terms,
+or grant commercial rights that you have not obtained. This license grants no
+trademark rights. Third-party materials and dependencies retain their own licenses;
+this license does not grant rights to them or override their conditions. In
+particular, Steinberg ASIO SDK and ASIO trademarks require their own applicable
+permissions. A commercial license for this project does not replace third-party
+permissions.
+
+4. Termination
+The permissions granted here terminate upon violation of these terms. On
+termination, stop the unauthorized use and distribution. Rights arising under
+mandatory applicable law are not restricted by this license.
+
+5. No Warranty; Limitation of Liability
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NONINFRINGEMENT. TO THE EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER IS NOT
+LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR
+ITS USE, WHETHER IN CONTRACT, TORT, OR OTHERWISE.
+
+This is a source-available, personal-use license. It is not an unrestricted
+open-source license. A separately signed commercial agreement controls the rights
+it expressly grants. This English text is the governing license text.

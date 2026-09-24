@@ -1,0 +1,76 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:firewall="http://wixtoolset.org/schemas/v4/wxs/firewall">
+  <Package Name="PiAoIP" Manufacturer="PiAoIP Project" Version="2.1.0"
+           ProductCode="{EF5E12A6-06CE-497F-B2FB-5BDE45853142}"
+           UpgradeCode="{B1550D7B-724C-4E29-B96E-E6963F4493BC}"
+           Language="1049" Codepage="1251" Scope="perMachine" InstallerVersion="500">
+    <MajorUpgrade DowngradeErrorMessage="Установлена более новая версия PiAoIP." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" />
+    <Property Id="WIN_BUILD">
+      <RegistrySearch Id="BuildSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+                      Name="CurrentBuildNumber" Type="raw" Bitness="always64" />
+    </Property>
+    <Property Id="NATIVE_ARCH">
+      <RegistrySearch Id="ArchitectureSearch" Root="HKLM" Key="SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
+                      Name="PROCESSOR_ARCHITECTURE" Type="raw" Bitness="always64" />
+    </Property>
+    <Launch Condition="Installed OR (VersionNT64 AND NATIVE_ARCH = &quot;AMD64&quot; AND WIN_BUILD &gt;= 22000 AND MsiNTProductType = 1)"
+            Message="PiAoIP требует Windows 11 x64. Windows ARM64 и Windows Server не поддерживаются." />
+    <Property Id="OLD_DRIVER" Secure="yes">
+      <RegistrySearch Id="OldDriverSearch" Root="HKLM" Key="SOFTWARE\Classes\CLSID\{A24D50B2-9111-4A6B-9C29-A01D617BC830}\InprocServer32"
+                      Type="raw" Bitness="always64" />
+    </Property>
+    <Property Id="LEGACY_DRIVER" Secure="yes">
+      <RegistrySearch Id="LegacyDriverSearch" Root="HKLM" Key="SOFTWARE\PiAoIP" Name="LegacyDriverPath"
+                      Type="raw" Bitness="always64" />
+    </Property>
+    <SetProperty Id="LEGACY_DRIVER" Value="[OLD_DRIVER]" Before="CostFinalize" Sequence="both"
+                 Condition="NOT LEGACY_DRIVER AND OLD_DRIVER AND NOT Installed" />
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="PiAoIP">
+        <Component Id="AsioDriver" Guid="*" Bitness="always64">
+          <File Id="AsioDll" Source="$(var.Payload)\PiAoipAsio.dll" KeyPath="yes" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\CLSID\{A24D50B2-9111-4A6B-9C29-A01D617BC830}" Type="string" Value="Pi AoIP" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\CLSID\{A24D50B2-9111-4A6B-9C29-A01D617BC830}\InprocServer32" Type="string" Value="[#AsioDll]" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\CLSID\{A24D50B2-9111-4A6B-9C29-A01D617BC830}\InprocServer32" Name="ThreadingModel" Type="string" Value="Both" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\ASIO\Pi AoIP" Name="CLSID" Type="string" Value="{A24D50B2-9111-4A6B-9C29-A01D617BC830}" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\ASIO\Pi AoIP" Name="Description" Type="string" Value="Pi AoIP up to 64 inputs / 64 outputs" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\PiAoIP" Name="LegacyDriverPath" Type="string" Value="[LEGACY_DRIVER]" />
+        </Component>
+        <Component Id="Panel" Guid="*" Bitness="always64">
+          <File Id="PanelExe" Source="$(var.Payload)\PiAoipControl.exe" KeyPath="yes">
+            <Shortcut Id="SettingsShortcut" Directory="ProgramMenuFolder" Name="PiAoIP Settings" WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+          </File>
+        </Component>
+        <Component Id="Diagnostics" Guid="*" Bitness="always64">
+          <File Source="$(var.Payload)\smoke_host.exe" KeyPath="yes" />
+        </Component>
+        <Component Id="Instructions" Guid="*" Bitness="always64">
+          <File Id="InstallGuide" Source="$(var.Payload)\INSTALL-RU.html" KeyPath="yes">
+            <Shortcut Id="GuideShortcut" Directory="ProgramMenuFolder" Name="PiAoIP Installation Guide" WorkingDirectory="INSTALLFOLDER" Advertise="yes" />
+          </File>
+        </Component>
+        <Component Id="SdkNotice" Guid="*" Bitness="always64">
+          <File Source="$(var.Payload)\ASIO-SDK-LICENSE.txt" KeyPath="yes" />
+        </Component>
+        <Component Id="ProjectLicense" Guid="*" Bitness="always64">
+          <File Source="$(var.Payload)\PROJECT-LICENSE.txt" KeyPath="yes" />
+        </Component>
+        <Component Id="AudioFirewall" Guid="*" Bitness="always64">
+          <RegistryValue Root="HKLM" Key="SOFTWARE\PiAoIP" Name="FirewallRuleVersion" Type="integer" Value="1" KeyPath="yes" />
+          <firewall:FirewallException Id="PiAoipAudioIn" Name="PiAoIP ASIO UDP 50021 (local subnet)"
+             Description="Incoming PiAoIP audio for ASIO hosts on the local subnet."
+             Port="50021" Protocol="udp" Scope="localSubnet" Profile="all" Enabled="yes" Action="allow" IgnoreFailure="no" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+    <Feature Id="Complete" Title="PiAoIP ASIO" Level="1">
+      <ComponentRef Id="AsioDriver" /><ComponentRef Id="Panel" /><ComponentRef Id="Diagnostics" />
+      <ComponentRef Id="Instructions" /><ComponentRef Id="SdkNotice" /><ComponentRef Id="ProjectLicense" /><ComponentRef Id="AudioFirewall" />
+    </Feature>
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.NoticeRtf)" />
+  </Package>
+</Wix>
