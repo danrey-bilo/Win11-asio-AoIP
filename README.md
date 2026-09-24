@@ -2,25 +2,27 @@
 
 # Win11-asio-AoIP
 
-ASIO-драйвер для **Windows 11 x64**: до 64 входов и 64 выходов по проводной
-сети, настройка профиля из панели драйвера и установка через MSI.
-Работает внутри 64-битного ASIO-хоста.
+**English** | [Русский](README.ru.md)
 
-**[Начало работы](docs/BUILD.md)** · **[Архитектура](docs/ARCHITECTURE.md)** · **[Техническое описание](docs/TECHNICAL.md)** · **[Проверки](docs/TESTING.md)** · **[Лицензия](docs/LICENSE-RU.md)**
+An ASIO driver for **Windows 11 x64**, providing up to 64 inputs and 64 outputs
+over a wired network, a settings panel for profile configuration and an MSI
+installer. Runs inside a 64-bit ASIO host.
 
-## Возможности
+**[Build](#build)** · **[How it works](#how-it-works)** · **[Documentation](#documentation)** · **[License](LICENSE)**
 
-| Параметр | Поддержка |
+## Features
+
+| Parameter | Support |
 |---|---|
-| Входы / выходы | Независимо 0–64 |
-| Частота / разрядность | До 192 кГц, PCM16/24/32 |
-| ASIO buffer | 16 / 32 / 64 / 128 / 256 / 512 / 1024 / 2048 |
-| Потоки | Приём, ASIO callback и отправка разделены |
-| Устойчивость | SPSC, Timeline, ограниченные сроки TX, счётчики срывов |
-| Настройки | Discovery, профиль, guard, RTT, INI пользователя |
-| Установка | MSI: ASIO/COM, панель, UDP firewall, repair/uninstall |
+| Inputs / outputs | Independently configurable from 0 to 64 |
+| Sample rate / format | Up to 192 kHz, PCM16/24/32 |
+| ASIO buffer | 16 / 32 / 64 / 128 / 256 / 512 / 1024 / 2048 frames |
+| Threads | Separate network receive, ASIO callback and network transmit threads |
+| Reliability | SPSC queues, Timeline, TX deadlines and dropout counters |
+| Settings | Discovery, profile, guard, RTT and per-user INI |
+| Installation | MSI: ASIO/COM registration, settings panel, UDP firewall rule, repair and uninstall |
 
-## Как работает
+## How it works
 
 ```mermaid
 flowchart LR
@@ -32,14 +34,16 @@ flowchart LR
   TX --> PI
 ```
 
-Это ASIO DLL. Она **не создаёт системные устройства «микрофон/динамики» Windows**.
-Для Discord, Telegram и WASAPI-приложений требуется отдельный Windows Audio
-драйвер/маршрутизатор. Windows ARM64 и 32-битные хосты не поддерживаются.
+This is an ASIO DLL. It **does not create Windows system microphone or speaker
+endpoints**. Discord, Telegram and WASAPI applications require a separate
+Windows Audio driver or routing layer. Windows ARM64 and 32-bit hosts are
+not supported.
 
-## Сборка
+## Build
 
-Нужны CMake, Ninja, LLVM-MinGW x64/UCRT и отдельно полученный Steinberg ASIO SDK.
-SDK не включён в репозиторий. [Лицензирование ASIO и зависимости](docs/ASIO-SDK.md).
+Requires CMake, Ninja, LLVM-MinGW x64/UCRT and a separately obtained Steinberg
+ASIO SDK. The SDK is not included in this repository. See the
+[ASIO SDK and licensing guide (Russian)](docs/ASIO-SDK.md).
 
 ```powershell
 git clone --recurse-submodules https://github.com/danrey-bilo/Win11-asio-AoIP.git
@@ -48,35 +52,53 @@ cd Win11-asio-AoIP
 ./packaging/msi/build-msi.ps1 -AsioSdkDir C:/SDK/asio
 ```
 
-Выходные DLL/EXE находятся в `build/windows/bin`, MSI — в `dist`.
-Сборка не регистрирует драйвер и не устанавливает его в систему.
-[Установка, сеть и настройки](docs/BUILD.md).
+The DLL and EXE files are written to `build/windows/bin`; the MSI is written
+to `dist`. Building does not register or install the driver. See the
+[installation, network and settings guide (Russian)](docs/BUILD.md).
 
-## Структура
+## Repository layout
 
 ```text
-src/driver/        IASIO/COM, жизненный цикл и движок потоков
-src/config/        профиль и пользовательский INI
-src/control/       обнаружение и команды UDP
-src/platform/      MMCSS, affinity и таймеры Windows
-src/ui/            панель настроек и ресурсы
-apps/              запуск панели
-tools/             минимальный ASIO-хост
-external/AoIP-lib/  общая библиотека, закреплённая git submodule
+src/driver/        IASIO/COM, lifecycle and streaming engine
+src/config/        profiles and per-user INI
+src/control/       discovery and UDP commands
+src/platform/      Windows MMCSS, affinity and timers
+src/ui/            settings panel and resources
+apps/              settings panel launcher
+tools/             minimal ASIO host
+external/AoIP-lib/  shared library pinned as a Git submodule
 packaging/msi/     WiX installer
-tests/             конфигурация Windows
-docs/              API, архитектура и инструкции
+tests/             Windows configuration checks
+docs/              API, architecture and guides
 ```
 
-**[Подключение своего ASIO-хоста](docs/API.md)** · **[Техническое описание](docs/TECHNICAL.md)**
+## Documentation
 
-## Компоненты проекта
+Detailed guides are currently available in Russian.
 
-| Репозиторий | Ответственность |
+| Guide | Contents |
 |---|---|
-| [AoIP-lib](https://github.com/danrey-bilo/AoIP-lib) | Протокол, PCM, очереди, временной буфер, UDP peer |
-| [Pi4-AoIP](https://github.com/danrey-bilo/Pi4-AoIP) | Raspberry Pi 4, PREEMPT_RT, Ethernet, CPU0/CPU1, systemd и DEB |
-| [Win11-asio-AoIP](https://github.com/danrey-bilo/Win11-asio-AoIP) | ASIO DLL, сетевые потоки Windows, панель настройки и MSI |
+| [Build and installation](docs/BUILD.md) | Toolchain, MSI, network setup and settings |
+| [ASIO host integration](docs/API.md) | Using the driver from your own host |
+| [Architecture](docs/ARCHITECTURE.md) | Driver components, threads and audio data flow |
+| [Technical overview](docs/TECHNICAL.md) | Transport characteristics and operating limits |
+| [Testing](docs/TESTING.md) | Test procedure and measurement scope |
+| [Build validation](docs/BUILD-VALIDATION.md) | Checks performed on the separated repository |
+| [ASIO SDK](docs/ASIO-SDK.md) | External dependency and distribution conditions |
 
-Личное некоммерческое использование бесплатно. Для коммерческого использования
-требуется отдельная платная лицензия. [Условия](LICENSE) · [Пояснение](docs/LICENSE-RU.md).
+## Related projects
+
+| Repository | Responsibility |
+|---|---|
+| [AoIP-lib](https://github.com/danrey-bilo/AoIP-lib) | Protocol, PCM, queues, timeline buffering and UDP peer |
+| [Pi4-AoIP](https://github.com/danrey-bilo/Pi4-AoIP) | Raspberry Pi 4, PREEMPT_RT, Ethernet, CPU0/CPU1, systemd and DEB |
+| [Win11-asio-AoIP](https://github.com/danrey-bilo/Win11-asio-AoIP) | ASIO DLL, Windows network threads, settings panel and MSI |
+
+## License
+
+Personal, noncommercial use is free. Commercial use requires a separate paid
+written license from the copyright holder. See the [license terms](LICENSE)
+or the [Russian explanation](docs/LICENSE-RU.md).
+
+The ASIO SDK remains subject to its own terms; a commercial license for this
+project does not replace them.
